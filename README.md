@@ -223,3 +223,67 @@ On a successful run:
 - Your FastAPI app is deployed and available at `http://10.161.14.44:8000/docs`
 
 
+
+## Part 5: Logging and Monitoring
+
+This section implements logging of prediction requests and monitoring of API performance metrics.
+
+---
+
+### ✅ Logging with SQLite (In-memory or file-based DB)
+
+- All incoming prediction requests and their outputs are logged into a SQLite database named `logs.db`.
+- Logs include:
+  - Timestamp
+  - Input features (MedInc, HouseAge, etc.)
+  - Predicted price
+- The log entries are stored in a table called `prediction_logs`.
+
+#### 🧠 Log Schema:
+| Column Name      | Type     |
+|------------------|----------|
+| id               | INTEGER (Auto Increment) |
+| timestamp        | TEXT     |
+| MedInc           | REAL     |
+| HouseAge         | REAL     |
+| AveRooms         | REAL     |
+| AveBedrms        | REAL     |
+| Population       | REAL     |
+| AveOccup         | REAL     |
+| Latitude         | REAL     |
+| Longitude        | REAL     |
+| predicted_price  | REAL     |
+
+#### 🚀 Endpoint: `/logs`
+
+- Purpose: Retrieve the latest predictions.
+- Returns a list of logs in reverse chronological order.
+- Accepts optional query param: `limit` (default = 10)
+
+Example:
+
+Response:
+```json
+
+{
+  "logs": [
+    [
+      1,
+      "2025-08-05T17:54:32.455535",
+      "MedInc=8.3252 HouseAge=41.0 AveRooms=6.9841 AveBedrms=1.0238 Population=322.0 AveOccup=2.5556 Latitude=37.88 Longitude=-122.23",
+      4.778788739495789
+    ]
+  ]
+}
+
+
+pip install prometheus-fastapi-instrumentator
+from prometheus_fastapi_instrumentator import Instrumentator
+app = FastAPI()
+Instrumentator().instrument(app).expose(app)
+
+
+
+#### 🚀 Endpoint: `/metrics`
+
+
