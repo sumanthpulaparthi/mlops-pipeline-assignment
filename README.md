@@ -182,3 +182,44 @@ CONTAINER ID   IMAGE                                                            
 b6820666cc79   housing-api:latest                                                "uvicorn api.app:app…"    9 minutes ago   Up 9 minutes   0.0.0.0:8000->8000/tcp, [::]:8000->8000/tcp             housing-api
 
 
+##  Part 4: CI/CD with GitHub Actions
+
+This project uses **GitHub Actions** to automate the CI/CD workflow, ensuring reliable and consistent deployment every time code is pushed to the `main` branch.
+
+###  CI/CD Features
+
+- **Linting**: Runs `flake8` on `src/` and `api/` directories to ensure code quality
+- **Build**: Builds a Docker image of the FastAPI prediction service
+- **Authentication**: Logs in to Docker Hub using secure GitHub secrets
+- **Push**: Pushes the image to Docker Hub repository  
+  → `docker.io/sumanth12345678/housing-api`
+- **Deploy**: Executes a shell script to deploy the app locally via Docker Compose
+
+###  Workflow Trigger
+
+The CI/CD pipeline runs automatically on:
+- Pushes to the `main` branch
+- Manual trigger via the **"Run Workflow"** button (enabled via `workflow_dispatch`)
+
+###  GitHub Secrets Used
+
+| Secret Name        | Description                      |
+|--------------------|----------------------------------|
+| `DOCKER_USERNAME`  | Docker Hub username              |
+| `DOCKER_PASSWORD`  | Docker Hub password or token     |
+
+###  Key Files
+
+| File                         | Purpose                          |
+|------------------------------|----------------------------------|
+| `.github/workflows/ci-cd.yml`| CI/CD pipeline definition        |
+| `deploy_local.sh`            | Deploys the container locally    |
+| `docker-compose.yml`         | Manages service deployment       |
+
+###  Example Output
+
+On a successful run:
+- The Docker image is built and pushed
+- Your FastAPI app is deployed and available at `http://10.161.14.44:8000/docs`
+
+

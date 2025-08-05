@@ -23,3 +23,6 @@ mlflow
 scikit-learn
 pydantic
 protobuf==3.20.3
+
+########for part 5##############
+prometheus-fastapi-instrumentator
