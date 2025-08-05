@@ -1,0 +1,25 @@
+# requirements.txt
+#########for part 1##############
+pandas
+scikit-learn
+dvc
+
+
+########for part 2###############
+
+pandas
+scikit-learn
+mlflow
+protobuf==3.20.3
+
+
+
+########for part 3###############
+
+
+fastapi
+uvicorn
+mlflow
+scikit-learn
+pydantic
+protobuf==3.20.3

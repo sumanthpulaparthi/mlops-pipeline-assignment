@@ -1,0 +1,10 @@
+version: "3.9"
+
+services:
+  housing-api:
+    image: housing-api:latest   # ✅ Use the pre-built image
+    container_name: housing-api
+    ports:
+      - "8000:8000"
+    restart: always
+
