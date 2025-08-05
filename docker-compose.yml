@@ -2,9 +2,14 @@ version: "3.9"
 
 services:
   housing-api:
-    image: housing-api:latest   # ✅ Use the pre-built image
+    #image: housing-api:latest  # ✅ Use the pre-built image
+    image: docker.io/sumanth12345678/housing-api
     container_name: housing-api
     ports:
       - "8000:8000"
-    restart: always
+    #restart: always
+    volumes:
+      - ./logs:/app/logs
+    environment:
+      - ENV=production
 
