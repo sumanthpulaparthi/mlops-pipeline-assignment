@@ -1,11 +1,11 @@
-i# Byte-compiled / cache
+# Byte-compiled / cache
 __pycache__/
 *.py[cod]
 *.ipynb_checkpoints
 
 # DVC artifacts
 data/raw/housing.csv
-*.dvc
+#*.dvc
 .dvc/
 !.dvc
 
