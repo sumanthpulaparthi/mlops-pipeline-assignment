@@ -1,9 +1,9 @@
 aliases: []
 creation_timestamp: 1754387471949
-current_stage: Production
+current_stage: Archived
 deployment_job_state: null
 description: null
-last_updated_timestamp: 1754387471956
+last_updated_timestamp: 1754467205985
 metrics: null
 model_id: null
 name: BestCaliforniaHousingModel

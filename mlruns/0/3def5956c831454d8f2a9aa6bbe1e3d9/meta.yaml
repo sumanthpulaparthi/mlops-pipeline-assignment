@@ -1,0 +1,14 @@
+artifact_uri: file:///home/coebct/mlops/ml-pipeline-project/mlruns/0/3def5956c831454d8f2a9aa6bbe1e3d9/artifacts
+end_time: 1754469033966
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 3def5956c831454d8f2a9aa6bbe1e3d9
+run_name: retrain_LinearRegression
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1754469033944
+status: 3
+tags: []
+user_id: root

@@ -4,7 +4,7 @@ __pycache__/
 *.ipynb_checkpoints
 
 # DVC artifacts
-data/raw/housing.csv
+#data/raw/housing.csv
 #*.dvc
 .dvc/
 !.dvc

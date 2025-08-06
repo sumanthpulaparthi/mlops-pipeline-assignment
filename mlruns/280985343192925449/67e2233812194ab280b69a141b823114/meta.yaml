@@ -1,0 +1,14 @@
+artifact_uri: file:///home/coebct/mlops/ml-pipeline-project/mlruns/280985343192925449/67e2233812194ab280b69a141b823114/artifacts
+end_time: 1754478405611
+entry_point_name: ''
+experiment_id: '280985343192925449'
+lifecycle_stage: active
+run_id: 67e2233812194ab280b69a141b823114
+run_name: Retrain_DecisionTree
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1754478401605
+status: 3
+tags: []
+user_id: root

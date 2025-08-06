@@ -1,80 +1,81 @@
-import mlflow
-from mlflow.tracking import MlflowClient
-from mlflow.exceptions import MlflowException
-from mlflow.sklearn import load_model, save_model
-
 import os
+import shutil
+from mlflow import MlflowClient, pyfunc
+from mlflow.pyfunc import load_model, save_model
+from mlflow.exceptions import MlflowException
+from mlflow.entities import ViewType
 
-# Constants
-EXPERIMENT_NAME = "California_Housing"
-REGISTERED_MODEL_NAME = "BestCaliforniaHousingModel"
 LOCAL_MODEL_PATH = "models/best_model"
 
-# Set tracking URI if needed (e.g., for remote MLflow)
-# mlflow.set_tracking_uri("http://your-tracking-server")
+def update_production_model():
+    client = MlflowClient()
 
-# Init MLflow client
-client = MlflowClient()
+    # 🔍 Find the latest run with the best MSE
+    experiments = client.search_experiments(view_type=ViewType.ACTIVE_ONLY)
+    best_run = None
+    best_mse = float("inf")
+    best_experiment_name = None
 
-# Step 1: Get experiment ID
-experiment = client.get_experiment_by_name(EXPERIMENT_NAME)
-if experiment is None:
-    raise ValueError(f"❌ Experiment '{EXPERIMENT_NAME}' not found.")
-experiment_id = experiment.experiment_id
+    # 🔍 Loop through experiments to find the best run
+    for experiment in experiments:
+        runs = client.search_runs(
+            experiment_ids=[experiment.experiment_id],
+            order_by=["metrics.mse ASC"],
+            max_results=1,
+        )
+        if runs:
+            run = runs[0]
+            mse = run.data.metrics.get("mse")
+            if mse is not None and mse < best_mse:
+                best_run = run
+                best_mse = mse
+                best_experiment_name = experiment.name
 
-# Step 2: Get best run based on MSE
-runs = client.search_runs(
-    experiment_ids=experiment_id,
-    order_by=["metrics.mse ASC"],
-    max_results=1
-)
+    if best_run is None:
+        raise ValueError("❌ No valid runs with 'mse' metric found.")
 
-if not runs:
-    raise ValueError("❌ No runs found in experiment.")
+    print(f"✅ Best run found: {best_run.info.run_id} in experiment '{best_experiment_name}', MSE = {best_mse:.4f}")
 
-best_run = runs[0]
-best_run_id = best_run.info.run_id
-best_mse = best_run.data.metrics["mse"]
-print(f"✅ Best model found: run_id={best_run_id}, MSE={best_mse}")
+    best_run_id = best_run.info.run_id
+    model_uri = f"runs:/{best_run_id}/model"
 
-# Step 3: Prepare model URI
-model_uri = f"runs:/{best_run_id}/model"
+    # 🏷️ Define registered model name from convention or tag (fallback to experiment name)
+    REGISTERED_MODEL_NAME = best_experiment_name.replace(" ", "_") + "_Model"
 
-# Step 4: Register model version (skip if already exists)
-try:
-    client.create_registered_model(REGISTERED_MODEL_NAME)
-    print(f"✅ Created registered model: {REGISTERED_MODEL_NAME}")
-except MlflowException as e:
-    if "already exists" in str(e):
-        print(f"ℹ️ Registered model '{REGISTERED_MODEL_NAME}' already exists.")
-    else:
-        raise e
+    # 🧹 Clean up local model dir
+    if os.path.exists(LOCAL_MODEL_PATH):
+        shutil.rmtree(LOCAL_MODEL_PATH)
+    os.makedirs(LOCAL_MODEL_PATH, exist_ok=True)
 
-# Step 5: Register new model version
-model_version = client.create_model_version(
-    name=REGISTERED_MODEL_NAME,
-    source=model_uri,
-    run_id=best_run_id
-)
+    # 🗂️ Create model registry entry
+    try:
+        client.create_registered_model(REGISTERED_MODEL_NAME)
+        print(f"✅ Created registered model: {REGISTERED_MODEL_NAME}")
+    except MlflowException as e:
+        if "already exists" in str(e):
+            print(f"ℹ️ Registered model '{REGISTERED_MODEL_NAME}' already exists.")
+        else:
+            raise e
 
-print(f"📌 Registered new version: {model_version.version}")
+    # 📦 Register this specific model version
+    model_version = client.create_model_version(
+        name=REGISTERED_MODEL_NAME,
+        source=f"{client.get_run(best_run_id).info.artifact_uri}/model",
+        run_id=best_run_id
+    )
+    print(f"📌 Registered new version: {model_version.version}")
 
-# Step 6: Transition to 'Production'
-client.transition_model_version_stage(
-    name=REGISTERED_MODEL_NAME,
-    version=model_version.version,
-    stage="Production",
-    archive_existing_versions=True
-)
+    # 🚀 Promote to Production (archive previous versions)
+    client.transition_model_version_stage(
+        name=REGISTERED_MODEL_NAME,
+        version=model_version.version,
+        stage="Production",
+        archive_existing_versions=True
+    )
+    print(f"🚀 Model version {model_version.version} is now in 'Production'")
 
-print(f"🚀 Model version {model_version.version} is now in 'Production'")
+    # 💾 Save best model locally
 
-# Step 7: Save best model locally for Docker/API
-print("💾 Saving best model locally to 'models/best_model'...")
-loaded_model = load_model(model_uri)
-
-# Ensure models directory exists
-os.makedirs(LOCAL_MODEL_PATH, exist_ok=True)
-save_model(loaded_model, LOCAL_MODEL_PATH)
-print("✅ Model saved locally.")
-
+    print("📥 Downloading and saving model artifacts locally...")
+    client.download_artifacts(run_id=best_run_id, path="model", dst_path=LOCAL_MODEL_PATH)
+    print(f"✅ Model artifacts downloaded to '{LOCAL_MODEL_PATH}'")

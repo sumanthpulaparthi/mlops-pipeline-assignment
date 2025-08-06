@@ -1,0 +1,10 @@
+artifact_location: file:///home/coebct/mlops/ml-pipeline-project/mlruns/280985343192925449/models/m-cde878c56f91440dbddac84e2e26c7b0/artifacts
+creation_timestamp: 1754472086479
+experiment_id: '280985343192925449'
+last_updated_timestamp: 1754472088351
+model_id: m-cde878c56f91440dbddac84e2e26c7b0
+model_type: null
+name: model
+source_run_id: e9a5746356a64418beb8f2f67cde694b
+status: 2
+status_message: null

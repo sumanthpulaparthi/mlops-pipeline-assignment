@@ -1,0 +1,14 @@
+artifact_uri: file:///home/coebct/mlops/ml-pipeline-project/mlruns/0/fcdd49fd42a14a5bbd8c06a18d95c0d2/artifacts
+end_time: 1754468310132
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: fcdd49fd42a14a5bbd8c06a18d95c0d2
+run_name: retrain_DecisionTree
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1754468310111
+status: 3
+tags: []
+user_id: root
