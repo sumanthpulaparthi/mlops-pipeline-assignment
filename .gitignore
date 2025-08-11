@@ -3,11 +3,14 @@ __pycache__/
 *.py[cod]
 *.ipynb_checkpoints
 
-# DVC artifacts
-#data/raw/housing.csv
-#*.dvc
+# these will be tracked in dvc
+data/
+models/
+#dvc meta data needs to be tracked
 .dvc/
 !.dvc
+!data/.gitkeep
+!models/.gitkeep
 
 # Environments
 .env

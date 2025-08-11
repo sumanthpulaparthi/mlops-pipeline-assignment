@@ -1,4 +1,4 @@
-# src/load_data.py
+# pipeline/load_data.py
 import pandas as pd
 from sklearn.datasets import fetch_california_housing
 

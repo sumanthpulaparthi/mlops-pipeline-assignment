@@ -1,14 +1,14 @@
 stages:
   load_data:
-    cmd: python3 src/load_data.py
+    cmd: python3 pipeline/load_data.py
     deps:
-    - src/load_data.py
+    - pipeline/load_data.py
     outs:
     - data/raw/housing.csv
   generate_data:
     cmd: python3 pipeline/generate_new_data.py
     deps:
-    - data/raw/california_housing.csv
+    - data/raw/housing.csv
     - pipeline/generate_new_data.py
     outs:
     - data/processed/generated_data.csv

@@ -88,11 +88,16 @@ if best_model is not None and best_run_id is not None:
 
     # --- Transition to 'Production' (if API is available/not deprecated) ---
     try:
-        client.transition_model_version_stage(
-            name=MLFLOW_MODEL_NAME,
-            version=version,
-            stage="Production",
-            archive_existing_versions=True
+        client.set_registered_model_alias(
+          name="CaliforniaHousingBestModel",
+         alias="production",
+         version=version
+        )
+        client.set_model_version_tag(
+           name="CaliforniaHousingBestModel",
+           version=version,
+           key="deployment_note",
+           value=f"MSE={best_mse:.4f}"
         )
         print(f"✅ Best model registered and promoted to Production as '{MLFLOW_MODEL_NAME}' (v{version})")
     except Exception as e:

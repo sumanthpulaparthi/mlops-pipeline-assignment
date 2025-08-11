@@ -26,3 +26,6 @@ protobuf==3.20.3
 
 ########for part 5##############
 prometheus-fastapi-instrumentator
+
+#########for part 6##############
+shutil

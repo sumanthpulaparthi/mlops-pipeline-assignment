@@ -83,12 +83,18 @@ async def retrain_model(df: pd.DataFrame):
         version = getattr(register_result, "version", None) or register_result
         version = str(version)
         try:
-            client.transition_model_version_stage(
-                name=mlflow_model_name,
-                version=version,
-                stage="Production",
-                archive_existing_versions=True
+            client.set_registered_model_alias(
+               name="CaliforniaHousingBestModel",
+               alias="production",
+               version=version
             )
+            client.set_model_version_tag(
+               name="CaliforniaHousingBestModel",
+               version=version,
+               key="deployment_note",
+               value=f"MSE={best_mse:.4f}"
+            )
+
             print(f"✅ Best model registered and promoted to Production as '{mlflow_model_name}' (v{version})")
         except Exception as e:
             print(f"⚠️ Could not transition model to 'Production': {e}")

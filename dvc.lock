@@ -1,0 +1,30 @@
+schema: '2.0'
+stages:
+  load_data:
+    cmd: python3 pipeline/load_data.py
+    deps:
+    - path: pipeline/load_data.py
+      hash: md5
+      md5: 3ac4bd77ce61401f6f39937a2ebabe7b
+      size: 353
+    outs:
+    - path: data/raw/housing.csv
+      hash: md5
+      md5: ca5b757f0729c68d74d05bf9d9ca8486
+      size: 1895154
+  generate_data:
+    cmd: python3 pipeline/generate_new_data.py
+    deps:
+    - path: data/raw/housing.csv
+      hash: md5
+      md5: ca5b757f0729c68d74d05bf9d9ca8486
+      size: 1895154
+    - path: pipeline/generate_new_data.py
+      hash: md5
+      md5: 2f03916f1812b0a310e76c2a16afd75c
+      size: 428
+    outs:
+    - path: data/processed/generated_data.csv
+      hash: md5
+      md5: 1d4ba2a387f9da947210357260a6cc3e
+      size: 9270
