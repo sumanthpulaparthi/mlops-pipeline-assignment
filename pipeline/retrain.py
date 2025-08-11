@@ -9,23 +9,22 @@ import mlflow
 import mlflow.sklearn
 from mlflow.tracking import MlflowClient
 
-async def retrain_model(df: pd.DataFrame):
+def retrain_model(df: pd.DataFrame):
     model_dir = "models"
     best_model_dir = os.path.join(model_dir, "best_model")
     experiment_name = "California_Housing"
     mlflow_model_name = "CaliforniaHousingBestModel"
 
-    # Create or clean output directories
     os.makedirs(model_dir, exist_ok=True)
     if os.path.exists(best_model_dir):
         shutil.rmtree(best_model_dir)
 
-    # Prepare data
     X = df.drop("MedHouseVal", axis=1)
     y = df["MedHouseVal"]
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42
+    )
 
-    # MLflow setup
     mlflow.set_tracking_uri("file:./mlruns")
     mlflow.set_experiment(experiment_name)
     client = MlflowClient()
@@ -52,15 +51,15 @@ async def retrain_model(df: pd.DataFrame):
                 mlflow.log_param("max_depth", 5)
             mlflow.log_metric("mse", float(mse))
 
-            # Log the model and include a small input example for signature
             mlflow.sklearn.log_model(
-                model, 
+                model,
                 "model",
                 input_example=X_test[:5]
             )
 
-            # Save retrained model locally
-            local_model_path = os.path.join(model_dir, f"{model_name.lower()}_retrained.pkl")
+            local_model_path = os.path.join(
+                model_dir, f"{model_name.lower()}_retrained.pkl"
+            )
             mlflow.sklearn.save_model(model, local_model_path)
             print(f"✅ {model_name} retrained. MSE: {mse:.4f}")
             print(f"📁 Model saved to: {local_model_path}")
@@ -70,9 +69,11 @@ async def retrain_model(df: pd.DataFrame):
                 best_model = model
                 best_run_id = run.info.run_id
 
-    # Register and promote the best model
     if best_model and best_run_id:
-        print(f"\n🏆 Saving and registering best model with MSE: {best_mse:.4f} to {best_model_dir}")
+        print(
+            f"\n🏆 Saving and registering best model with MSE: "
+            f"{best_mse:.4f} to {best_model_dir}"
+        )
         mlflow.sklearn.save_model(best_model, best_model_dir)
 
         best_model_uri = f"runs:/{best_run_id}/model"
@@ -84,18 +85,20 @@ async def retrain_model(df: pd.DataFrame):
         version = str(version)
         try:
             client.set_registered_model_alias(
-               name="CaliforniaHousingBestModel",
-               alias="production",
-               version=version
+                name="CaliforniaHousingBestModel",
+                alias="production",
+                version=version
             )
             client.set_model_version_tag(
-               name="CaliforniaHousingBestModel",
-               version=version,
-               key="deployment_note",
-               value=f"MSE={best_mse:.4f}"
+                name="CaliforniaHousingBestModel",
+                version=version,
+                key="deployment_note",
+                value=f"MSE={best_mse:.4f}"
             )
-
-            print(f"✅ Best model registered and promoted to Production as '{mlflow_model_name}' (v{version})")
+            print(
+                f"✅ Best model registered and promoted to Production as "
+                f"'{mlflow_model_name}' (v{version})"
+            )
         except Exception as e:
             print(f"⚠️ Could not transition model to 'Production': {e}")
     else:

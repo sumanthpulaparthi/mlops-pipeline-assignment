@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 import os
 import shutil
 from sklearn.model_selection import train_test_split
@@ -25,7 +24,9 @@ print(f"📥 Loading dataset from {DATA_PATH}")
 df = pd.read_csv(DATA_PATH)
 X = df.drop("MedHouseVal", axis=1)
 y = df["MedHouseVal"]
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
 
 # ========== MLflow Setup ==========
 mlflow.set_tracking_uri("file:./mlruns")
@@ -55,11 +56,14 @@ for model_name, model in models.items():
             mlflow.log_param("max_depth", 5)
         mlflow.log_metric("mse", float(mse))
 
-        # Log the model (do not use artifact_path in new MLflow, use 'name')
-        mlflow.sklearn.log_model(model, "model", input_example=X_test[:5])
+        mlflow.sklearn.log_model(
+            model, "model", input_example=X_test[:5]
+        )
 
         # Save locally as backup (optional, not required for MLflow)
-        local_model_path = os.path.join(MODEL_DIR, f"{model_name.lower()}.pkl")
+        local_model_path = os.path.join(
+            MODEL_DIR, f"{model_name.lower()}.pkl"
+        )
         mlflow.sklearn.save_model(model, local_model_path)
         print(f"✅ {model_name} MSE: {mse:.4f}")
         print(f"📁 Model saved to: {local_model_path}")
@@ -89,24 +93,26 @@ if best_model is not None and best_run_id is not None:
     # --- Transition to 'Production' (if API is available/not deprecated) ---
     try:
         client.set_registered_model_alias(
-          name="CaliforniaHousingBestModel",
-         alias="production",
-         version=version
+            name="CaliforniaHousingBestModel",
+            alias="production",
+            version=version
         )
         client.set_model_version_tag(
-           name="CaliforniaHousingBestModel",
-           version=version,
-           key="deployment_note",
-           value=f"MSE={best_mse:.4f}"
+            name="CaliforniaHousingBestModel",
+            version=version,
+            key="deployment_note",
+            value=f"MSE={best_mse:.4f}"
         )
-        print(f"✅ Best model registered and promoted to Production as '{MLFLOW_MODEL_NAME}' (v{version})")
+        print(
+            f"✅ Best model registered and promoted to Production as "
+            f"'{MLFLOW_MODEL_NAME}' (v{version})"
+        )
     except Exception as e:
         print(f"⚠️  Could not transition model to 'Production'. Details: {e}")
 
     # Save best model locally (for backup)
     mlflow.sklearn.save_model(best_model, BEST_MODEL_DIR)
     print(f"📁 Backup saved locally to: {BEST_MODEL_DIR}")
-
 else:
     print("No model was trained successfully.")
 
