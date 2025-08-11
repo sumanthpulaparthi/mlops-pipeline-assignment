@@ -5,7 +5,7 @@ __pycache__/
 
 # these will be tracked in dvc
 data/
-models/
+#models/
 #dvc meta data needs to be tracked
 .dvc/
 !.dvc
