@@ -6,8 +6,6 @@ from fastapi.middleware.cors import CORSMiddleware
 
 # Load the best model from MLflow
 MODEL_URI = "models:/BestCaliforniaHousingModel/Production"
-#model = mlflow.pyfunc.load_model(MODEL_URI)
-
 from api.database import init_db, log_to_db,get_logs
 ''' For docker to load the best model '''
 model = mlflow.pyfunc.load_model("models/best_model")
@@ -21,22 +19,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 init_db()
-''' This is the base model with out using pydantic library
-class HouseFeatures(BaseModel):
-    
-    MedInc: float
-    HouseAge: float
-    AveRooms: float
-    AveBedrms: float
-    Population: float
-    AveOccup: float
-    Latitude: float
-    Longitude: float
-'''
 
-'''
-   pydantic library contains input validations for each Field
-'''
 
 from pydantic import BaseModel, Field
 
@@ -44,13 +27,15 @@ class HouseFeatures(BaseModel):
     MedInc: float = Field(
         ..., 
         ge=0, 
-        description="Median income in the neighborhood (in tens of thousands of dollars)"
+        description="Median income in the neighborhood "
+                    "(in tens of thousands of dollars)"
     )
     HouseAge: float = Field(
         ..., 
         ge=0, 
         le=100, 
-        description="Median age of houses in the neighborhood (0-100 years)"
+        description="Median age of houses in the "
+                    "neighborhood (0-100 years)"
     )
     AveRooms: float = Field(
         ..., 
@@ -76,13 +61,15 @@ class HouseFeatures(BaseModel):
         ..., 
         ge=32.0, 
         le=42.0, 
-        description="Geographical latitude of the neighborhood (California: 32–42)"
+        description="Geographical latitude of the neighborhood"
+                    "(California: 32–42)"
     )
     Longitude: float = Field(
         ..., 
         ge=-125.0, 
         le=-114.0, 
-        description="Geographical longitude of the neighborhood (California: -125 to -114)"
+        description="Geographical longitude of the neighborhood "
+                     "(California: -125 to -114)"
     )
 
 @app.get("/")
