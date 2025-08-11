@@ -1,8 +1,8 @@
 aliases:
-  production: '19'
+  production: '10'
 creation_timestamp: 1754474167630
 deployment_job_id: null
 deployment_job_state: null
 description: null
-last_updated_timestamp: 1754897534922
+last_updated_timestamp: 1754914204724
 name: CaliforniaHousingBestModel

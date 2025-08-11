@@ -8,6 +8,7 @@ WORKDIR /app
 COPY requirements.txt .
 COPY api/ ./api/
 COPY models/ ./models/
+COPY pipeline/ ./pipeline/
 # Install dependencies
 RUN pip install --no-cache-dir --upgrade pip \
  && pip install --no-cache-dir -r requirements.txt
