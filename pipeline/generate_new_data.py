@@ -1,5 +1,4 @@
 from sklearn.datasets import fetch_california_housing
-import pandas as pd
 import os
 
 # Ensure the processed folder exists

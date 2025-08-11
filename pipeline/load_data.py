@@ -1,4 +1,3 @@
-import pandas as pd
 from sklearn.datasets import fetch_california_housing
 
 

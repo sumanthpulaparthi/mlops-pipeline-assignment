@@ -45,4 +45,3 @@ def get_logs(limit):
     results = cursor.fetchall()
     conn.close()
     return results
-

@@ -12,7 +12,7 @@ from pipeline.retrain import retrain_model
 
 # Load the best model from MLflow
 MODEL_URI = "models:/BestCaliforniaHousingModel/Production"
-model = mlflow.pyfunc.load_model("models/best_model")  # For docker to load the best model
+model = mlflow.pyfunc.load_model("models/best_model")
 
 app = FastAPI(title="California Housing Price Predictor")
 
@@ -132,4 +132,3 @@ async def retrain(file: UploadFile = File(...)):
 
         return {"message": "Retraining triggered successfully."}
     return {"error": "Please upload a valid .csv file"}
-
