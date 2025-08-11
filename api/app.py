@@ -124,7 +124,7 @@ import pandas as pd
 import io
 import os
 
-from src.retrain import retrain_model
+from pipeline.retrain import retrain_model
 
 @app.post("/retrain")
 async def retrain(file: UploadFile = File(...)):
