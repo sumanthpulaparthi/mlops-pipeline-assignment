@@ -10,4 +10,3 @@ def load_and_save_data():
 
 if __name__ == "__main__":
     load_and_save_data()
-

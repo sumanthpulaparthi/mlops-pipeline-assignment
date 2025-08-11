@@ -13,4 +13,3 @@ output_path = "data/processed/generated_data.csv"
 df.sample(100).to_csv(output_path, index=False)
 
 print(f"✅ {output_path} generated.")
-
