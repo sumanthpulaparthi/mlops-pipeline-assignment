@@ -10,7 +10,7 @@ import mlflow.sklearn
 from mlflow.tracking import MlflowClient
 
 
-def retrain_model(df: pd.DataFrame):
+async def retrain_model(df: pd.DataFrame):
     model_dir = "models"
     best_model_dir = os.path.join(model_dir, "best_model")
     experiment_name = "California_Housing"
