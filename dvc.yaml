@@ -1,0 +1,23 @@
+stages:
+  load_data:
+    cmd: python3 src/load_data.py
+    deps:
+    - src/load_data.py
+    outs:
+    - data/raw/housing.csv
+  generate_data:
+    cmd: python3 pipeline/generate_new_data.py
+    deps:
+    - data/raw/california_housing.csv
+    - pipeline/generate_new_data.py
+    outs:
+    - data/processed/generated_data.csv
+
+  train_and_save_best_model:
+    cmd: python3 pipeline/train.py
+    deps:
+    - data/processed/generated_data.csv
+    - pipeline/train.py
+    outs:
+    - models/best_model
+
