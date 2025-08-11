@@ -26,7 +26,7 @@ jobs:
         pip install flake8 pytest
 
     - name: 🔍 Lint code
-      run: flake8 api/ src/
+      run: flake8 api/ pipeline/
 
     - name: 🧪 Run tests (optional)
       run: |
