@@ -1,27 +1,17 @@
 
 ---
 
-
+Step 1:
 - Load and preprocess the **California Housing Dataset**
 - Organize the project with a clean folder structure
 - Track dataset versions using **DVC**
 - Maintain code and data versioning with **Git**
 
 ---
- Folder Structure:
-
-.
-├── data
-│   └── raw
-│       ├── housing.csv
-│       └── housing.csv.dvc
-├── logs
-├── models
-├── notebooks
-├── README.md
-├── requirements.txt
-└── src
-    └── load_data.py
+ data, models  Folder will be mantained in DVC (Data Version Control)
+ Remaining Every File will be mantained in Git Repository
+ Git Hub Link:
+ https://github.com/sumanthpulaparthi/mlops-pipeline-assignment/
 
 
 -----
@@ -38,7 +28,23 @@
 3. **Dataset Tracking with DVC**
    - Initialized DVC (`dvc init`)
    - Added dataset to DVC tracking:  
-     `dvc add data/raw/housing.csv`
+     `dvc stage add -n load_data \
+      -d src/load_data.py \
+      -o data/raw/housing.csv \
+      python3 src/load_data.py
+
+      dvc stage add -n generate_data \
+      -d pipeline/generate_new_data.py \
+      -d data/raw/california_housing.csv \
+      -o data/processed/generated_data.csv \
+      python3 pipeline/generate_new_data.py
+
+
+      dvc stage add -n train_and_save_best_model \
+      -d pipeline/train.py \
+      -d data/processed/generated_data.csv \
+      -o models/model.pkl \
+      python pipeline/train.py`
    - Committed `.dvc` files to Git for version control
 
 4. **.gitignore Fixes**
@@ -55,7 +61,7 @@
 
 Install required libraries:
 ```bash
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 
 ---
 
@@ -73,6 +79,75 @@ This stage focuses on training regression models and tracking experiments using 
 - Log parameters, metrics (MSE), and models with **MLflow**
 - Save trained models to the `models/` directory
 
+
+
+## 📁 Key Files & Structure
+
+ml-pipeline-project/
+├── api
+│   ├── app.py
+│   ├── database.py
+│   ├── logger.py
+│   └── __pycache__
+│       ├── app.cpython-310.pyc
+│       └── database.cpython-310.pyc
+├── data
+│   ├── dvc.yaml
+│   ├── new_data.csv
+│   ├── processed
+│   │   └── generated_data.csv
+│   └── raw
+│       ├── housing.csv
+│       └── housing.csv.dvc
+├── deploy_local.sh
+├── docker-compose-prometheus.yml
+├── docker-compose.yml
+├── Dockerfile
+├── dvc.lock
+├── dvc.yaml
+├── generate_new_data.py
+├── logs.db
+├── models
+│   ├── best_model
+│   │   ├── conda.yaml
+│   │   ├── MLmodel
+│   │   ├── model.pkl
+│   │   ├── python_env.yaml
+│   │   └── requirements.txt
+│   ├── decisiontree.pkl
+│   │   ├── conda.yaml
+│   │   ├── MLmodel
+│   │   ├── model.pkl
+│   │   ├── python_env.yaml
+│   │   └── requirements.txt
+│   ├── decisiontree_retrained.pkl
+│   │   ├── conda.yaml
+│   │   ├── MLmodel
+│   │   ├── model.pkl
+│   │   ├── python_env.yaml
+│   │   └── requirements.txt
+│   ├── linearregression.pkl
+│   │   ├── conda.yaml
+│   │   ├── MLmodel
+│   │   ├── model.pkl
+│   │   ├── python_env.yaml
+│   │   └── requirements.txt
+│   └── linearregression_retrained.pkl
+│       ├── conda.yaml
+│       ├── MLmodel
+│       ├── model.pkl
+│       ├── python_env.yaml
+│       └── requirements.txt
+├── new_data.csv
+├── pipeline
+│   ├── generate_new_data.py
+│   ├── load_data.py
+│   ├── retrain.py
+│   └── train.py
+├── prometheus.yml
+├── README.md
+└── requirements.txt
+
 ---
 
 ## 📁 Key Files & Structure
@@ -90,22 +165,9 @@ This stage focuses on training regression models and tracking experiments using 
 - Save trained models to the `models/` directory
 
 ---
-
-## 📁 Key Files & Structure
-
-ml-pipeline-project/
-├── data/raw/housing.csv # Input dataset (DVC tracked)
-├── models/ # Output models
-├── src/
-│ ├── load_data.py # Loads dataset (used in Part 1)
-│ └── train.py # ✅ Trains & tracks models
-├── requirements.txt
-├── mlruns/ # Auto-generated MLflow tracking directory
-
-
 Train the Model
 
-python3 src/train.py
+python3 pipeline/train.py
 
 
 
@@ -118,13 +180,13 @@ mlflow ui --host 0.0.0.0 --port 5000
 
 🔧 Training LinearRegression...
 ✅ LinearRegression trained. MSE: 0.5558915986952444
-📁 Model saved to: models/linearregression.pkl
+
 
 🔧 Training DecisionTree...
 ✅ DecisionTree trained. MSE: 0.5245146178314735
 📁 Model saved to: models/decisiontree.pkl
 
-
+📁 Model saved to: models/best_model
 
 
 
@@ -223,7 +285,6 @@ On a successful run:
 - Your FastAPI app is deployed and available at `http://10.161.14.44:8000/docs`
 
 
-
 ## Part 5: Logging and Monitoring
 
 This section implements logging of prediction requests and monitoring of API performance metrics.
@@ -277,7 +338,7 @@ Response:
 }
 
 
-pip install prometheus-fastapi-instrumentator
+pip3 install prometheus-fastapi-instrumentator
 from prometheus_fastapi_instrumentator import Instrumentator
 app = FastAPI()
 Instrumentator().instrument(app).expose(app)
@@ -285,5 +346,22 @@ Instrumentator().instrument(app).expose(app)
 
 
 #### 🚀 Endpoint: `/metrics`
+
+
+###########Step 6: Bonus###############################################
+In addition to the core pipeline, the project includes advanced MLOps capabilities for robustness, monitoring, and automation:
+
+✅ Input Validation with Pydantic
+Ensures that incoming API requests follow the expected data schema, preventing invalid inputs from being processed.
+
+📊 Prometheus Integration for Metrics Monitoring
+Real-time application and model performance metrics are exposed via /metrics endpoint and can be visualized using Grafana dashboards.
+
+🔄 Automated Model Retraining Trigger
+On arrival of new data, the pipeline automatically triggers model retraining, re-evaluates performance, and updates the registered model in MLflow if the new version outperforms the current one.
+
+📈 Continuous Model Performance Tracking
+Key metrics such as MSE, MAE, and R² are monitored over time to detect performance degradation (model drift).
+
 
 
